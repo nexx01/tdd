@@ -1,0 +1,51 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User")
+Container( WebApplication , "Web Application", "Browser", " The frontend application for users.")
+Container( MobileApplication , "Mobile Application", "Browser", " Native apps for iOS and Android.")
+Container(loadBalancer, "Load Balancer", "Nginx", "Uses round robin")
+Container(apiGateway, "Api gateway", "", "Uses round robin")
+'
+'ContainerQueue(messageQueue, "Events queue", "Kafka", "Message queue for events by tiny URLs")
+
+System_Boundary(BackendServices, "Backend Services") {
+    Container(userService, "User Service", "Java", "Handles creation tiny URL and redirects to long URL from tiny URL", $tags="webApp")
+    Container( FeedService , "FeedService ", "Java", "",  $tags="webApp")
+    Container( MediaService , "MediaService ", "Java", "",  $tags="webApp")
+    Container( FeedBackService , "FeedBackService", "Java", "",  $tags="webApp")
+    Container( RelationService , "RelationService", "Java", "",  $tags="webApp")
+    Container( PostService , "Post Service ", "Java", "Stores long URLs by tiny URLs",  $tags="webApp")
+'    Container( CommentService , "Comment Service ", "Java", "",  $tags="webApp")
+    ContainerDb(feedBackDatabase, "database", "PgSQL", "Stores posts",  $tags="db")
+    ContainerDb(relationDatabase, "database", "PgSQL", "Stores posts",  $tags="db")
+    ContainerDb(postDatabase, "database", "PgSQL", "Stores posts",  $tags="db")
+
+    ContainerDb(s3, "Storage S3", "Minio", "Storage Media",  $tags="db")
+    ContainerDb(feedCache, "URL cache", "Tarantool", "Stores popular long URLs by tiny URLs",  $tags="db")
+    ContainerQueue(messageQueue, "Events queue", "Kafka", "Message queue for events by tiny URLs" )
+}
+
+Rel(user, WebApplication, "")
+Rel(user, MobileApplication, "")
+Rel(MobileApplication, loadBalancer, "Rest request", "REST")
+Rel(WebApplication, loadBalancer, "Rest request", "REST")
+Rel(loadBalancer, apiGateway, "", "REST")
+Rel(apiGateway, userService, "", "REST")
+Rel(apiGateway, PostService, "", "REST")
+Rel(apiGateway, FeedService, "", "REST")
+Rel(apiGateway, MediaService, "", "REST")
+Rel(apiGateway, FeedBackService, "", "REST")
+Rel(apiGateway, "RelationService", "", "REST")
+
+Rel(PostService,messageQueue,"","")
+Rel(FeedService,PostService,"","")
+Rel(FeedService,feedCache,"","")
+Rel(messageQueue, FeedService,"","")
+'Rel(loadBalancer, CommentService, "", "REST")
+Rel(PostService, postDatabase,"", "SQL")
+Rel(MediaService, s3,"", "REST")
+Rel(FeedBackService, feedBackDatabase,"", "REST")
+Rel(RelationService, relationDatabase,"", "REST")
+
+@enduml

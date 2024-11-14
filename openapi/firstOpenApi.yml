@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: social network VK REST API- OpenAPI 3.0
+  description: |-
+    This is homework in system design course.
+  contact:
+    email: h@h
+  license:
+    name: ...
+    url: ...
+  version: 1.0.0
+externalDocs:
+  description: ...
+  url: ...
+servers:
+  - url: ...
+tags:
+  - name: friend
+    description: Everything about your friends
+  - name: user
+    description: Everything about user
+  - name: feed
+    description: Everything about feed
+  - name: chats
+    description: Everything about message in chats
+paths:
+  /api/v1/user/{user_id}/friend/{friend_id}:
+    post:
+      tags:
+        - friend
+      summary: Add a new friend
+
+      description: Add a new friend
+      operationId: addFriend
+      parameters:
+        - in: header
+          name: requestId
+          schema:
+            type: integer
+          required: true
+        - in: header
+          name: Content-Length
+          schema:
+            type: integer
+            default: 0
+        - in: path
+          name: user_id
+          description: user id
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: path
+          name: friend_id
+          description: friend id
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '202':
+          description: Successful operation
+        '400':
+          description: Invalid ID
+        '404':
+          description: Friend not found
+        '422':
+          description: Validation exeption
+    delete:
+      tags:
+        - friend
+      summary: Remove user from friend
+      parameters:
+        - in: header
+          name: requestId
+          schema:
+            type: integer
+            format: int64
+          required: true
+        - in: path
+          name: user_id
+          description: user_id
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: friend_id
+          description: friend id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalide Id
+        '404':
+          description: Friend not found
+  /api/v1/getFriends:
+    post:
+      tags:
+        - friend
+      description: get List friends
+      parameters:
+        - in: header
+          name: requiestId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+      responses:
+        '200':
+          description: friend's list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/friend'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /profile:
+    post:
+      tags:
+        - user
+      description: get User profile
+      parameters:
+        - in: header
+          name: requestId
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+      responses:
+        '200':
+          description: user's profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/userProfile'
+        '404':
+          description: user not found
+  /user/post:
+    post:
+      tags:
+        - user
+      description: public post to feed
+      parameters:
+        - in: header
+          name: requestId
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Post'
+      responses:
+        '202':
+          description: accepted post
+  /user/feed:
+    post:
+      tags:
+        - friend, user
+      description: get news feed
+      parameters:
+        - in: header
+          name: requestId
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                user_id:
+                  type: string
+                pageNumber:
+                  type: integer
+
+      responses:
+        '200':
+          description: user id for get feed
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  schema:
+                    type: "array"
+                    items:
+                      $ref: "#/components/schemas/Post"
+                  $ref: "#/components/schemas/Page"
+
+
+
+
+
+components:
+  schemas:
+    userProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        imageUrl:
+          type: string
+          example: http://someUrl
+        text:
+          type: string
+          example: Good morning my friends
+    friend:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 112200-11
+        imageUrl:
+          type: string
+          example: http://fff
+        name:
+          type: string
+          example: Ivan
+        surname:
+          type: string
+          example: Ivanov
+    Post:
+      type: object
+      properties:
+        imageUrl:
+          type: string
+          example: http://fff
+        text:
+          type: string
+    Page:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          example: 1
+        isLastPage:
+          type: boolean
+          example: false
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

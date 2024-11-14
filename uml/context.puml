@@ -1,0 +1,12 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "User")
+Container(socialNetwork, "Social Network (Web & Mobile)", "Software system", "Mobile Apps: iOS and Android applications for users to access the social network. Web Application: The main web interface for users.")
+Container(thirdPartyAPIs, "Third Party Serices", "Software system", "External services such as payment gateways, email services, or analytics services.")
+Container(adminPanel, "Admin Panel", "Software system", "For administrators to manage users and content.")
+
+Rel(user, socialNetwork, "Interacts with")
+Rel(socialNetwork, thirdPartyAPIs, "Uses")
+Rel(thirdPartyAPIs, adminPanel, "Admins manage")
+@enduml
